@@ -1,8 +1,3 @@
-variable "availability_zone_names" {
-  type    = list(string)
-  default = ["us-east-1a", "us-east-1e", "us-east-1d"]
-}
-
 variable "zero-address" {
     type = string
     default = "0.0.0.0/0"
@@ -23,6 +18,14 @@ variable "region" {
     default = "us-east-1"
 }
 
+variable "access_key" {
+  description = "Access key"
+}
+
+variable "secret_key" {
+  description = "Secret key"
+}
+
 variable "subnet_prefix" {
-  description = "Cidr block for subnet"
+   description = "Cidr block for subnet"
 }
