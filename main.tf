@@ -81,7 +81,7 @@ resource "aws_route_table_association" "subnrt" {
     route_table_id = aws_route_table.main-route-table.id
 }
 
-# 6. Create Security Group to allow port 22, 80, 443
+# 6. Create Security Group to allow port 22, 80, 443, 8080
 resource "aws_security_group" "allow_web" {
     name = "allow_web_traffic"
     description = "Allow web inboundd traffic"
@@ -99,6 +99,14 @@ resource "aws_security_group" "allow_web" {
         description = "HTTP"
         from_port = 80
         to_port = 80
+        protocol = "tcp"
+        cidr_blocks = [var.zero-address]
+    }
+
+    ingress {
+        description = "HTTP"
+        from_port = 8080
+        to_port = 8080
         protocol = "tcp"
         cidr_blocks = [var.zero-address]
     }
@@ -174,6 +182,10 @@ resource "aws_instance" "web-server" {
                 sudo apt update -y
                 sudo apt install jenkins -y
                 sudo systemctl status jenkins
+                sudo ufw allow 8080
+                sudo ufw allow OpenSSH
+                sudo ufw enable -y
+                sudo cat /var/lib/jenkins/secrets/initialAdminPassword
                 EOF
     
     tags = {
