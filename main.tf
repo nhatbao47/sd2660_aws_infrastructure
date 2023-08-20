@@ -180,8 +180,8 @@ resource "aws_instance" "web-server" {
 }
 
 # 10. Create ECR
-resource "aws_ecr_repository" "devops_repo" {
-    name = "sd2660-devops-repo"
+resource "aws_ecr_repository" "frontend_repo" {
+    name = "frontend"
     image_tag_mutability = var.immutable_ecr_repositories ? "IMMUTABLE" : "MUTABLE"
     force_delete = true
     image_scanning_configuration {
@@ -189,13 +189,13 @@ resource "aws_ecr_repository" "devops_repo" {
     }
 
     tags = {
-        Name  = "Practical DevOps Repository"
-        Group = "Assigment"
+        Name  = "Frontend repository"
+        Group = "Practical DevOps assigment"
     }
 }
 
-resource "aws_ecr_lifecycle_policy" "devops_lifecycle_policy" {
-  repository = aws_ecr_repository.devops_repo.name
+resource "aws_ecr_lifecycle_policy" "frontend_lifecycle_policy" {
+  repository = aws_ecr_repository.frontend_repo.name
 
   policy = <<EOF
             {
@@ -218,8 +218,8 @@ resource "aws_ecr_lifecycle_policy" "devops_lifecycle_policy" {
             EOF
 }
 
-resource "aws_ecr_repository_policy" "devops-repo-policy" {
-  repository = aws_ecr_repository.devops_repo.name
+resource "aws_ecr_repository_policy" "frontend_repo_policy" {
+  repository = aws_ecr_repository.frontend_repo.name
   policy     = <<EOF
   {
     "Version": "2008-10-17",
@@ -244,15 +244,69 @@ resource "aws_ecr_repository_policy" "devops-repo-policy" {
   EOF
 }
 
-# resource "null_resource" "update_docker_fund" {
-#   provisioner "local-exec" {
-#     working_dir = "nginx"
-#     command     = "chmod +x update-ecr.sh && sh -x update-ecr.sh"
-#   }
+resource "aws_ecr_repository" "backend_repo" {
+    name = "backend"
+    image_tag_mutability = var.immutable_ecr_repositories ? "IMMUTABLE" : "MUTABLE"
+    force_delete = true
+    image_scanning_configuration {
+        scan_on_push = true
+    }
 
-#   depends_on = [aws_ecr_repository.devops_repo, aws_ecr_lifecycle_policy.devops_lifecycle_policy, aws_ecr_repository_policy.devops-repo-policy]
-# }
+    tags = {
+        Name  = "Backend repository"
+        Group = "Practical DevOps assigment"
+    }
+}
 
+resource "aws_ecr_lifecycle_policy" "backend_lifecycle_policy" {
+  repository = aws_ecr_repository.backend_repo.name
+
+  policy = <<EOF
+            {
+                "rules": [
+                    {
+                        "rulePriority": 1,
+                        "description": "Expire images older than 14 days",
+                        "selection": {
+                            "tagStatus": "any",
+                            "countType": "sinceImagePushed",
+                            "countUnit": "days",
+                            "countNumber": 14
+                        },
+                        "action": {
+                            "type": "expire"
+                        }
+                    }
+                ]
+            }
+            EOF
+}
+
+resource "aws_ecr_repository_policy" "backend_repo_policy" {
+  repository = aws_ecr_repository.backend_repo.name
+  policy     = <<EOF
+  {
+    "Version": "2008-10-17",
+    "Statement": [
+      {
+        "Sid": "Set the permission for ECR",
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:BatchGetImage",
+          "ecr:CompleteLayerUpload",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:GetLifecyclePolicy",
+          "ecr:InitiateLayerUpload",
+          "ecr:PutImage",
+          "ecr:UploadLayerPart"
+        ]
+      }
+    ]
+  }
+  EOF
+}
 
 # 11. Create EKS
 locals {
