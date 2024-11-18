@@ -1,21 +1,16 @@
-variable "zero-address" {
+variable "zero_address" {
     type = string
     default = "0.0.0.0/0"
 }
 
-variable "docker_image_tag" {
-    type = string
-    description = "This is the tag which will be used for the created image"
-    default = "latest"
-}
-
 variable "immutable_ecr_repositories" {
-    type = bool
-    default = true
+  description = "Whether ECR repositories should be immutable"
+  type        = bool
+  default     = false
 }
 
 variable "region" {
-    default = "us-east-1"
+    default = "ap-southeast-1"
 }
 
 variable "access_key" {
@@ -28,4 +23,23 @@ variable "secret_key" {
 
 variable "subnet_prefix" {
    description = "Cidr block for subnet"
+}
+
+variable "ecr_repositories" {
+  default = {
+    frontend = {
+      name = "frontend"
+      tags = {
+        Name  = "Frontend repository"
+        Group = "Practical DevOps assignment"
+      }
+    },
+    backend = {
+      name = "backend"
+      tags = {
+        Name  = "Backend repository"
+        Group = "Practical DevOps assignment"
+      }
+    }
+  }
 }
