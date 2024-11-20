@@ -33,4 +33,10 @@ Access to http://public-ip:8080
 
 # Connect to EKS in terminal for kubectl
 aws configure
+
 aws eks --region ap-southeast-1 update-kubeconfig --name sd2660-devops-eks
+
+kubectl get all
+
+* Note: Cannot execute kubectl command
+Add IAM access entry to sd2660-devops-eks with AmazonEKSAdminPolicy and AmazonEKSClusterAdminPolicy
