@@ -40,3 +40,5 @@ kubectl get all
 
 * Note: Cannot execute kubectl command
 Add IAM access entry to sd2660-devops-eks with AmazonEKSAdminPolicy and AmazonEKSClusterAdminPolicy
+
+Add AmazonEBSCSIDriverPolicy to node group IAM role

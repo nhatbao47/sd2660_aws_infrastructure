@@ -243,6 +243,7 @@ resource "aws_ecr_repository_policy" "repo_policy" {
                         "ecr:InitiateLayerUpload",
                         "ecr:PutImage",
                         "ecr:UploadLayerPart",
+                        "ecr:DescribeImages",
                         "ecr:GetAuthorizationToken"
                       ]
                     }
